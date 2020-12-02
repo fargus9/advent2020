@@ -2,7 +2,7 @@ package advent2020.day1
 
 import java.io.File
 
-fun day1Input(parent: String = "") = File(parent, "/1/input.txt").readLines()
+fun day1Input(parent: String) = File(parent, "/1/input.txt").readLines()
     .asSequence()
     .map { it.toInt() }
     .sorted()
@@ -33,7 +33,7 @@ tailrec fun find2020BySummingThree(values: IntArray, lower: Int, middle: Int, up
     }
 }
 
-fun main() = with (day1Input()) {
+fun main(repoPath: String = "") = with (day1Input(repoPath)) {
     println(find2020BySummingTwo(this, 0, lastIndex))
 
     println(find2020BySummingThree(this, 0, 1, lastIndex))
