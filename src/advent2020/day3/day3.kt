@@ -17,14 +17,10 @@ val test = """..##.......
 fun day3Input(parent: String) = File(parent, "/3/input.txt").readLines().asSequence()
 
 // something about the filtering and column calculation isn't right with the larger tileset
-fun Sequence<String>.countTreesBySlope(x: Int, y: Int, debug: Boolean = false) = drop(y)
+fun Sequence<String>.countTreesBySlope(x: Int, y: Int) = drop(y)
     .filterIndexed { row, _ -> row % y == 0 }
     .filterIndexed { iteration, tile ->
         val column = (iteration + 1) * x % tile.length
-        if (debug) {
-            val replacement = if (tile[column] == '#') 'X' else 'O'
-            println(tile.replaceRange(column, column + 1, replacement.toString()))
-        }
         tile[column] == '#'
     }.count()
 
