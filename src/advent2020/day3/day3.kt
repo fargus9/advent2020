@@ -28,25 +28,25 @@ fun Sequence<String>.countTreesBySlope(x: Int, y: Int, debug: Boolean = false) =
         tile[column] == '#'
     }.count()
 
-fun main() {
-    with (day3Input("./")) {
-        println(drop(2).filterIndexed { row, _ -> row % 2 == 0 }.count())
-
+fun main(args: Array<String>) {
+    with (day3Input(args.firstOrNull() ?: "./")) {
         println(countTreesBySlope(3, 1) == 289)
 
         // this value is supposed to be wrong but the simpler data works
-        arrayOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2).fold(1) { total, (x, y) ->
-            total * countTreesBySlope(x, y)
+        arrayOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2).fold(1.toBigInteger()) { total, (x, y) ->
+            total * countTreesBySlope(x, y).toBigInteger()
         }
-    }  // 1227434288 bad 307034024 too
+    }
 
     arrayOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2).fold(1) { total, (x, y) ->
         total * test.split("\n").asSequence().countTreesBySlope(x, y)
     } == 336
 
-    test.split("\n").asSequence().countTreesBySlope(1, 1) == 2
-    test.split("\n").asSequence().countTreesBySlope(3, 1) == 7
-    test.split("\n").asSequence().countTreesBySlope(5, 1) == 3
-    test.split("\n").asSequence().countTreesBySlope(7, 1) == 4
-    test.split("\n").asSequence().countTreesBySlope(1, 2) == 2
+    with (test.split("\n").asSequence()) {
+        println(countTreesBySlope(1, 1) == 2)
+        println(countTreesBySlope(3, 1) == 7)
+        println(countTreesBySlope(5, 1) == 3)
+        println(countTreesBySlope(7, 1) == 4)
+        println(countTreesBySlope(1, 2) == 2)
+    }
 }
