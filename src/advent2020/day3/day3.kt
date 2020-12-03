@@ -2,7 +2,7 @@ package advent2020.day3
 
 import java.io.File
 
-val test = """..##.......
+const val test = """..##.......
 #...#...#..
 .#....#..#.
 ..#.#...#.#
@@ -24,18 +24,17 @@ fun Sequence<String>.countTreesWithSlope(x: Int, y: Int) = drop(y)
     }.count()
 
 fun main() {
+    val slopesToCheck = sequenceOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
     with (day3Input("./")) {
         println(countTreesWithSlope(3, 1) == 289)
 
-        val computation = sequenceOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
-            .map { (x, y) -> countTreesWithSlope(x, y).toBigInteger() }
+        val computation = slopesToCheck.map { (x, y) -> countTreesWithSlope(x, y).toBigInteger() }
             .reduce { total, value -> total * value }
         println(computation)
     }
 
     with (test.split("\n").asSequence()) {
-        println(sequenceOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
-            .map { (x, y) -> countTreesWithSlope(x, y) }
+        println(slopesToCheck.map { (x, y) -> countTreesWithSlope(x, y) }
             .reduce { total, value -> total * value } == 336)
 
         println(countTreesWithSlope(1, 1) == 2)
