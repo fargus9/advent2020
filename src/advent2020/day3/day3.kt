@@ -30,13 +30,14 @@ fun main() {
 
         // this value is supposed to be wrong but the simpler data works
         val computation = arrayOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
-            .fold(1.toBigInteger()) { total, (x, y) -> total * countTreesWithSlope(x, y).toBigInteger() }
+            .map { (x, y) -> countTreesWithSlope(x, y).toBigInteger() }
+            .reduce { total, value -> total * value }
         println(computation)
     }
 
-    println(arrayOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2).fold(1) { total, (x, y) ->
-        total * test.split("\n").asSequence().countTreesWithSlope(x, y)
-    } == 336)
+    println(arrayOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2).map { (x, y) ->
+        test.split("\n").asSequence().countTreesWithSlope(x, y)
+    }.reduce { total, value -> total * value } == 336)
 
     with (test.split("\n").asSequence()) {
         println(countTreesWithSlope(1, 1) == 2)
