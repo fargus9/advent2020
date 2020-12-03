@@ -29,7 +29,7 @@ fun Sequence<String>.countTreesBySlope(x: Int, y: Int, debug: Boolean = false) =
     }.count()
 
 fun main() {
-    with (day3Input("../../../")) {
+    with (day3Input("./")) {
         println(drop(2).filterIndexed { row, _ -> row % 2 == 0 }.count())
 
         println(countTreesBySlope(3, 1) == 289)

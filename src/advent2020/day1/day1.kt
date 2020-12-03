@@ -33,7 +33,7 @@ tailrec fun find2020BySummingThree(values: IntArray, lower: Int, middle: Int, up
     }
 }
 
-fun main(repoPath: String = "../../../") = with (day1Input(repoPath)) {
+fun main(repoPath: String = "./") = with (day1Input(repoPath)) {
     println(find2020BySummingTwo(this, 0, lastIndex))
 
     println(find2020BySummingThree(this, 0, 1, lastIndex))

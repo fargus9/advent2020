@@ -8,7 +8,7 @@ fun day2Input(parent: String) = File(parent, "/2/input.txt").readLines().asSeque
     Triple(lower.rangeTo(upper), characterMatch[0], pwd)
 }
 
-fun main(repoPath: String = "../../../") = with (day2Input(repoPath)) {
+fun main(repoPath: String = "./") = with (day2Input(repoPath)) {
     val boundedMatches = count { (bounds, match, pwd) ->
         bounds.contains(pwd.count { element -> element == match })
     }
