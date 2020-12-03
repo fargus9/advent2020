@@ -16,7 +16,6 @@ val test = """..##.......
 
 fun day3Input(parent: String) = File(parent, "/3/input.txt").readLines().asSequence()
 
-// something about the filtering and column calculation isn't right with the larger tileset
 fun Sequence<String>.countTreesWithSlope(x: Int, y: Int) = drop(y)
     .filterIndexed { row, _ -> row % y == 0 }
     .filterIndexed { iteration, tile ->
