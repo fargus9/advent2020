@@ -27,17 +27,17 @@ fun main() {
     with (day3Input("./")) {
         println(countTreesWithSlope(3, 1) == 289)
 
-        val computation = arrayOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
+        val computation = sequenceOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
             .map { (x, y) -> countTreesWithSlope(x, y).toBigInteger() }
             .reduce { total, value -> total * value }
         println(computation)
     }
 
     with (test.split("\n").asSequence()) {
-        println(arrayOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
+        println(sequenceOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
             .map { (x, y) -> countTreesWithSlope(x, y) }
             .reduce { total, value -> total * value } == 336)
-        
+
         println(countTreesWithSlope(1, 1) == 2)
         println(countTreesWithSlope(3, 1) == 7)
         println(countTreesWithSlope(5, 1) == 3)
