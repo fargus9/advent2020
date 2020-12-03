@@ -17,16 +17,16 @@ val test = """..##.......
 fun day3Input(parent: String) = File(parent, "/3/input.txt").readLines().asSequence()
 
 // something about the filtering and column calculation isn't right with the larger tileset
-fun Sequence<String>.countTreesBySlope(x: Int, y: Int, output: Boolean = false) = drop(y)
+fun Sequence<String>.countTreesBySlope(x: Int, y: Int, debug: Boolean = false) = drop(y)
     .filterIndexed { row, _ -> row % y == 0 }
-    .foldIndexed(0) { row, total, tile ->
-        val column = (row + 1) * x % tile.length
-        if (output) {
+    .filterIndexed { iteration, tile ->
+        val column = (iteration + 1) * x % tile.length
+        if (debug) {
             val replacement = if (tile[column] == '#') 'X' else 'O'
             println(tile.replaceRange(column, column + 1, replacement.toString()))
         }
-        total + if (tile[column] == '#') 1 else 0
-    }
+        tile[column] == '#'
+    }.count()
 
 fun main() {
     with (day3Input("../../../")) {
