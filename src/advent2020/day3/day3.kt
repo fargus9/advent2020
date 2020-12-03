@@ -1,5 +1,7 @@
 package advent2020.day3
 
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 const val test = """..##.......
@@ -23,8 +25,8 @@ fun Sequence<String>.countTreesWithSlope(x: Int, y: Int) = drop(y)
         tile[column] == '#'
     }.count()
 
-fun main() {
-    val slopesToCheck = sequenceOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
+fun main() = runBlocking {
+    val slopesToCheck = flowOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2).buffer()
     with (day3Input("./")) {
         println(countTreesWithSlope(3, 1) == 289)
 
