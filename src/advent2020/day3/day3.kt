@@ -26,17 +26,19 @@ fun Sequence<String>.countTreesWithSlope(x: Int, y: Int) = drop(y)
     }.count()
 
 fun main() = runBlocking {
-    val slopesToCheck = flowOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2).buffer()
+    val slopesToCheck = flowOf(1 to 1, 3 to 1, 5 to 1, 7 to 1, 1 to 2)
     with (day3Input("./")) {
         println(countTreesWithSlope(3, 1) == 289)
 
         val computation = slopesToCheck.map { (x, y) -> countTreesWithSlope(x, y).toBigInteger() }
+            .buffer()
             .reduce { total, value -> total * value }
         println(computation)
     }
 
     with (test.split("\n").asSequence()) {
         println(slopesToCheck.map { (x, y) -> countTreesWithSlope(x, y) }
+            .buffer()
             .reduce { total, value -> total * value } == 336)
 
         println(countTreesWithSlope(1, 1) == 2)
