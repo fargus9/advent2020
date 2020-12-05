@@ -18,7 +18,7 @@ tailrec fun findIndex(range: IntRange, directions: Directions, predicate: (Char)
     val newRange = if (predicate(directions.first())) range.lowerHalf else range.upperHalf
     return when (newRange.count()) {
         2 -> if (predicate(directions.last())) newRange.first else newRange.last
-        1 -> range.first
+        1 -> newRange.first
         else -> findIndex(newRange, directions.drop(1), predicate)
     }
 }
@@ -47,33 +47,24 @@ fun main() {
     assertEquals(4.rangeTo(5), 4.rangeTo(7).lowerHalf)
 
     with (testPass1.asSequence()) {
-        val rowGroup = take(7)
-        val row = findIndex(rowsOfPlane, rowGroup) { it == 'F' }
+        val (row, seat, id) = findSeat()
         assertEquals(70, row)
-        val seatGroup = drop(7)
-        val seat = findIndex(seatsOfPlane, seatGroup) { it == 'L' }
         assertEquals(7, seat)
-        assertEquals(567, findSeatId())
+        assertEquals(567, id)
     }
 
     with (testPass2.asSequence()) {
-        val rowGroup = take(7)
-        val row = findIndex(rowsOfPlane, rowGroup) { it == 'F' }
+        val (row, seat, id) = findSeat()
         assertEquals(14, row)
-        val seatGroup = drop(7)
-        val seat = findIndex(seatsOfPlane, seatGroup) { it == 'L' }
         assertEquals(7, seat)
-        assertEquals(119, findSeatId())
+        assertEquals(119, id)
     }
 
     with (testPass3.asSequence()) {
-        val rowGroup = take(7)
-        val row = findIndex(rowsOfPlane, rowGroup) { it == 'F' }
+        val (row, seat, id) = findSeat()
         assertEquals(102, row)
-        val seatGroup = drop(7)
-        val seat = findIndex(seatsOfPlane, seatGroup) { it == 'L' }
         assertEquals(4, seat)
-        assertEquals(820, findSeatId())
+        assertEquals(820, id)
     }
 
     val testOutput = sequenceOf(testPass1, testPass2, testPass3).map { it.asSequence().findSeatId() }.max()
