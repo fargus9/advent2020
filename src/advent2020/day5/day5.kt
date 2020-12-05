@@ -31,7 +31,7 @@ fun Directions.findSeat(): Seat {
     val row = findIndex(rowsOfPlane, rowGroup) { it == 'F' }
     val seatGroup = drop(7)
     val seat = findIndex(seatsOfPlane, seatGroup) { it == 'L' }
-    return Seat(row, seat, row * 8 + seat);
+    return Seat(row, seat, row * 8 + seat)
 }
 fun Directions.findSeatId(): Int = findSeat().third
 
@@ -75,7 +75,7 @@ fun main() {
 
     val seatIds = Array(128) { arrayOfNulls<Int>(8) }
     input.splitToSequence("\n").map { it.asSequence().findSeat() }.forEach { (row, seat, id) ->
-        seatIds[row][seat] = id;
+        seatIds[row][seat] = id
     }
 
     val projectedRow = seatIds.indexOfFirst { seats -> seats.count { it == null } == 1 }
