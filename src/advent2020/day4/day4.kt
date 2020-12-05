@@ -46,7 +46,8 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719"""
 val validFields = setOf("byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid",)
 val requiredFields = validFields.minus("cid")
 
-fun String.countValidPassports(validationPredicate: (MutableMap<String, String>) -> Boolean) = splitToSequence("\n")
+typealias PassportData = Map<String, String>
+fun String.countValidPassports(validationPredicate: (PassportData) -> Boolean) = splitToSequence("\n")
     .fold(mutableListOf(mutableMapOf<String, String>())) { list, input ->
         if (input.isEmpty()) {
             list.add(mutableMapOf())
@@ -57,9 +58,9 @@ fun String.countValidPassports(validationPredicate: (MutableMap<String, String>)
         list
     }.count(validationPredicate)
 
-fun MutableMap<String, String>.validateKeys() = keys == validFields || keys == requiredFields
+fun PassportData.validateKeys() = keys == validFields || keys == requiredFields
 
-fun MutableMap<String, String>.validateFields(): Boolean = all { (field, data) ->
+fun PassportData.validateFields(): Boolean = all { (field, data) ->
     when (field) {
         "byr" -> 1920.rangeTo(2002).contains(data.toInt())
         "iyr" -> 2010.rangeTo(2020).contains(data.toInt())
