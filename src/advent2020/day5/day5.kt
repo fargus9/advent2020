@@ -25,13 +25,14 @@ tailrec fun findIndex(range: IntRange, directions: Directions, predicate: (Char)
 
 val rowsOfPlane = 0.rangeTo(127)
 val seatsOfPlane = 0.rangeTo(7)
+fun seatIdOf(row: Int, seat: Int) = row * 8 + seat
 typealias Seat = Triple<Int, Int, Int>
 fun Directions.findSeat(): Seat {
     val rowGroup = take(7)
     val row = findIndex(rowsOfPlane, rowGroup) { it == 'F' }
     val seatGroup = drop(7)
     val seat = findIndex(seatsOfPlane, seatGroup) { it == 'L' }
-    return Seat(row, seat, row * 8 + seat)
+    return Seat(row, seat, seatIdOf(row, seat))
 }
 fun Directions.findSeatId(): Int = findSeat().third
 
@@ -80,6 +81,6 @@ fun main() {
 
     val projectedRow = seatIds.indexOfFirst { seats -> seats.count { it == null } == 1 }
     val projectedSeat = seatIds[projectedRow].indexOf(null)
-    val projectedSeatId = projectedRow * 8 + projectedSeat
+    val projectedSeatId = seatIdOf(projectedRow, projectedSeat)
     println("row: $projectedRow seat: $projectedSeat id: $projectedSeatId")
 }
