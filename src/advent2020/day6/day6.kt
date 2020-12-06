@@ -18,51 +18,46 @@ a
 
 b"""
 
-typealias Answers = MutableMap<Char, Int>
-
+typealias Answers = Set<Char>
 fun String.collectGroupAnswers(): MutableList<Answers> = splitToSequence("\n")
-    .fold(mutableListOf(mutableMapOf())) { groupList, line ->
-        if (line.isEmpty()) {
-            groupList.add(mutableMapOf())
+    .fold(mutableListOf(mutableSetOf())) { groupList, line ->
+        val groupAnswers = if (line.isEmpty()) {
+            setOf()
         } else {
-            with (groupList.last()) {
-                line.forEach { put(it, getOrDefault(it, 1)) }
-            }
+            val answers = groupList.removeAt(groupList.lastIndex)
+            answers.plus(line.asIterable())
         }
-        groupList
+        groupList.also { it.add(groupAnswers) }
     }
 
-fun defaultAnswers(): Answers = 'a'.rangeTo('z').associateWith { 0 }.toMutableMap()
+fun defaultAnswers(): Answers = 'a'.rangeTo('z').toMutableSet()
 fun String.collectGroupUnanimousAnswers(): MutableList<Answers> = splitToSequence("\n")
     .fold(mutableListOf(defaultAnswers())) { groupList, line ->
-        if (line.isEmpty()) {
-            groupList.add(defaultAnswers())
+        val groupAnswers = if (line.isEmpty()) {
+            defaultAnswers()
         } else {
-            with (groupList.last()) {
-                val agreedUpon = keys.intersect(line.asIterable()).associateWith { getOrDefault(it, 0) + 1 }
-                clear()
-                putAll(agreedUpon)
-            }
+            val groupAnswers = groupList.removeAt(groupList.lastIndex)
+            groupAnswers.intersect(line.asIterable())
         }
-        groupList
+        groupList.also { it.add(groupAnswers) }
     }
-
 
 fun main() {
     val testAnswers = sample.collectGroupAnswers()
-    assertEquals(setOf('a', 'b', 'c'), testAnswers[0].keys)
-    assertEquals(setOf('a', 'b', 'c'), testAnswers[1].keys)
-    assertEquals(setOf('a', 'b', 'c'), testAnswers[2].keys)
-    assertEquals(setOf('a'), testAnswers[3].keys)
-    assertEquals(setOf('b'), testAnswers[4].keys)
-    assertEquals(11, testAnswers.sumBy { it.keys.size })
+    assertEquals(setOf('a', 'b', 'c'), testAnswers[0])
+    assertEquals(setOf('a', 'b', 'c'), testAnswers[1])
+    assertEquals(setOf('a', 'b', 'c'), testAnswers[2])
+    assertEquals(setOf('a'), testAnswers[3])
+    assertEquals(setOf('b'), testAnswers[4])
+    assertEquals(11, testAnswers.sumBy { it.size })
 
-    val pt1 = input.collectGroupAnswers().sumBy { it.keys.size }
+    val pt1 = input.collectGroupAnswers().sumBy { it.size }
     println(pt1)
     assertEquals(6585, pt1)
 
-    assertEquals(6, sample.collectGroupUnanimousAnswers().sumBy { it.keys.size })
+    assertEquals(6, sample.collectGroupUnanimousAnswers().sumBy { it.size })
 
-    val pt2 = input.collectGroupUnanimousAnswers().sumBy { it.keys.size }
+    val pt2 = input.collectGroupUnanimousAnswers().sumBy { it.size }
     println(pt2)
+    assertEquals(3276, pt2)
 }
