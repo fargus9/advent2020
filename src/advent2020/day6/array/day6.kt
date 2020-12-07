@@ -19,9 +19,9 @@ a
 
 b"""
 
-typealias Answers = Array<Int?>
+typealias Answers = Array<Boolean?>
 val alphabet = 'a'.rangeTo('z')
-fun blankArray(initializer: (Int) -> Int? = { 0 }): Answers = Array(alphabet.count(), initializer)
+fun blankArray(initializer: (Int) -> Boolean? = { false }): Answers = Array(alphabet.count(), initializer)
 fun String.collectGroupAnswers(combine: (Answers, String) -> Answers): MutableList<Answers> = lineSequence()
     .fold(mutableListOf(blankArray())) { groupList, line ->
         val groupAnswers = if (line.isEmpty()) {
@@ -34,25 +34,27 @@ fun String.collectGroupAnswers(combine: (Answers, String) -> Answers): MutableLi
     }
 
 fun String.collectCommonGroupAnswers() = collectGroupAnswers { answers, line ->
-    line.forEach { answers[it - 'a'] = answers[it - 'a']?.plus(1) ?: 1 }
+    line.forEach { answers[it - 'a'] = answers[it - 'a']?.or(true) }
     answers
 }
 
 fun String.collectUnanimousGroupAnswers() = collectGroupAnswers { answers, line ->
     val intersection = blankArray { null }
-    line.forEach { intersection[it - 'a'] = answers[it - 'a']?.plus(1) }
+    line.forEach { intersection[it - 'a'] = answers[it - 'a']?.or(true) }
     intersection
 }
 
+fun Answers.countValid() = count { value -> value?.equals(true) == true }
+fun List<Answers>.accumulate() = sumBy { it.countValid() }
 fun main() {
     val testAnswers = sample.collectCommonGroupAnswers()
-    assertEquals(11, testAnswers.sumBy { it.count { value -> value != null && value > 0 } })
+    assertEquals(11, testAnswers.accumulate())
 
-    val pt1 = input.collectCommonGroupAnswers().sumBy { it.count { value -> value != null && value > 0 } }
+    val pt1 = input.collectCommonGroupAnswers().accumulate()
     assertEquals(6585, pt1)
 
-    assertEquals(6, sample.collectUnanimousGroupAnswers().sumBy { it.count { value -> value != null } })
+    assertEquals(6, sample.collectUnanimousGroupAnswers().accumulate())
 
-    val pt2 = input.collectUnanimousGroupAnswers().sumBy { it.count { value -> value != null } }
+    val pt2 = input.collectUnanimousGroupAnswers().accumulate()
     assertEquals(3276, pt2)
 }
