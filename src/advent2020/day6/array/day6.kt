@@ -39,7 +39,7 @@ fun String.collectCommonGroupAnswers() = collectGroupAnswers { answers, line ->
 }
 fun String.collectUnanimousGroupAnswers() = collectGroupAnswers { answers, line ->
     val intersection = blankArray { null }
-    line.forEach { intersection[it - 'a'] = answers[it - 'a']?.plus(1) }
+    line.forEach { with (it - 'a') { intersection[this] = answers[this]?.plus(1) } }
     intersection
 }
 
