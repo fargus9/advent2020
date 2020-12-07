@@ -21,25 +21,25 @@ dark blue bags contain 2 dark violet bags.
 dark violet bags contain no other bags."""
 
 typealias NestingBagRules = Map<String, Array<String?>>
-fun String.collectNestingBagRules(): NestingBagRules = splitToSequence(".\n").associate {
+fun String.collectNestingBagRules(): NestingBagRules = lineSequence().associate {
     val (outer, contents) = it.split(" bags contain ")
     val bagCounts = contents.replace(".", "").split(", ")
     val bagColors = bagCounts.map { count -> count.replace("(^[0-9]+ | bag[s]?$)".toRegex(), "") }
     outer to bagColors.map { color -> color.takeUnless { match -> match.startsWith("no other") } }.toTypedArray()
 }
 
-fun findBagsThatMayContain(rules: NestingBagRules, colors: Array<String>): Sequence<String> {
+fun findBagsThatMayContain(rules: NestingBagRules, colors: List<String>): Sequence<String> {
     if (rules.isEmpty() || colors.isEmpty()) return emptySequence()
     val (containedBy, notContainedBy) = rules.asSequence()
         .partition { (_, contents) -> contents.intersect(colors.asIterable()).isNotEmpty() }
     val containingColors = containedBy.asSequence().map { (key, _) -> key }
     return containingColors +
-            findBagsThatMayContain(notContainedBy.associate { (key, value) -> key to value }, containingColors.toList().toTypedArray())
+            findBagsThatMayContain(notContainedBy.associate { (key, value) -> key to value }, containingColors.toList())
 }
 
 typealias BagCount = Map<String, Int>
 typealias CountingBagRules = Map<String, BagCount>
-fun String.collectCountingBagRules(): CountingBagRules = splitToSequence("\n").associate { line ->
+fun String.collectCountingBagRules(): CountingBagRules = lineSequence().associate { line ->
     val (outer, contents) = line.split(" bags contain ")
     val bagCounts = contents.replace(".", "").split(", ")
         .map { count -> count.replace(" bag[s]?$".toRegex(), "") }
@@ -51,17 +51,18 @@ fun String.collectCountingBagRules(): CountingBagRules = splitToSequence("\n").a
 }
 
 fun findBagRequirementsFor(rules: CountingBagRules, color: String): Int {
-    return rules[color]?.asSequence()?.sumBy { ( key, value) -> value + findBagRequirementsFor(rules, key) * value } ?: 0
+    return rules[color]?.asSequence()?.sumBy { ( innerColor, count) ->
+        count + findBagRequirementsFor(rules, innerColor) * count } ?: 0
 }
 
 fun main() {
     val sampleRules = sampleInput.collectNestingBagRules()
-    val sampleOutput = findBagsThatMayContain(sampleRules, arrayOf("shiny gold")).count()
+    val sampleOutput = findBagsThatMayContain(sampleRules, listOf("shiny gold")).count()
     assertEquals(4, sampleOutput)
 
     val pt1Rules = input.collectNestingBagRules()
-    val pt1Output = findBagsThatMayContain(pt1Rules, arrayOf("shiny gold")).count()
-    println(pt1Output)
+    val pt1Output = findBagsThatMayContain(pt1Rules, listOf("shiny gold")).count()
+    assertEquals(151, pt1Output)
 
     val sampleCountingRules = sampleInput.collectCountingBagRules()
     val sampleCountingOutput = findBagRequirementsFor(sampleCountingRules, "shiny gold")
