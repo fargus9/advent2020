@@ -34,12 +34,13 @@ fun String.collectGroupAnswers(combine: (Answers, String) -> Answers): MutableLi
     }
 
 fun String.collectCommonGroupAnswers() = collectGroupAnswers { answers, line ->
-    line.forEach { with (it - 'a') { answers[this] = answers[this]?.plus(1) ?: 1 } }
+    line.forEach { answers[it - 'a'] = answers[it - 'a']?.plus(1) ?: 1 }
     answers
 }
+
 fun String.collectUnanimousGroupAnswers() = collectGroupAnswers { answers, line ->
     val intersection = blankArray { null }
-    line.forEach { with (it - 'a') { intersection[this] = answers[this]?.plus(1) } }
+    line.forEach { intersection[it - 'a'] = answers[it - 'a']?.plus(1) }
     intersection
 }
 
