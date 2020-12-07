@@ -21,11 +21,11 @@ b"""
 
 typealias Answers = Array<Boolean?>
 val alphabet = 'a'.rangeTo('z')
-fun blankArray(initializer: (Int) -> Boolean? = { false }): Answers = Array(alphabet.count(), initializer)
+fun defaultAnswers(initializer: (Int) -> Boolean? = { false }): Answers = Array(alphabet.count(), initializer)
 fun String.collectGroupAnswers(combine: (Answers, String) -> Answers): MutableList<Answers> = lineSequence()
-    .fold(mutableListOf(blankArray())) { groupList, line ->
+    .fold(mutableListOf(defaultAnswers())) { groupList, line ->
         val groupAnswers = if (line.isEmpty()) {
-            blankArray()
+            defaultAnswers()
         } else {
             val answers = groupList.removeAt(groupList.lastIndex)
             combine(answers, line)
@@ -39,7 +39,7 @@ fun String.collectCommonGroupAnswers() = collectGroupAnswers { answers, line ->
 }
 
 fun String.collectUnanimousGroupAnswers() = collectGroupAnswers { answers, line ->
-    val intersection = blankArray { null }
+    val intersection = defaultAnswers { null }
     line.forEach { intersection[it - 'a'] = answers[it - 'a']?.or(true) }
     intersection
 }
