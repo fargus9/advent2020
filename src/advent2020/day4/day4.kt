@@ -62,13 +62,13 @@ fun PassportData.validateKeys() = keys == validFields || keys == requiredFields
 
 fun PassportData.validateFields(): Boolean = all { (field, data) ->
     when (field) {
-        "byr" -> 1920.rangeTo(2002).contains(data.toInt())
-        "iyr" -> 2010.rangeTo(2020).contains(data.toInt())
-        "eyr" -> 2020.rangeTo(2030).contains(data.toInt())
+        "byr" -> data.toInt() in 1920..2002
+        "iyr" -> data.toInt() in 2010..2020
+        "eyr" -> data.toInt() in 2020..2030
         "hgt" -> {
             when (data.takeLast(2)) {
-                "cm" -> 150.rangeTo(193).contains(data.dropLast(2).toInt())
-                "in" -> 59.rangeTo(76).contains(data.dropLast(2).toInt())
+                "cm" -> data.dropLast(2).toInt() in 150..193
+                "in" -> data.dropLast(2).toInt() in 59..76
                 else -> false
             }
         }
@@ -81,23 +81,18 @@ fun PassportData.validateFields(): Boolean = all { (field, data) ->
 }
 
 fun main() {
-    println("processing sample")
     val sampleOutput = exampleText.countValidPassports { it.validateKeys() }
-    println(sampleOutput)
+    assertEquals(2, sampleOutput)
 
-    println("processing pt1")
     val pt1Output = input.countValidPassports { it.validateKeys() }
-    println(pt1Output)
+    assertEquals(228, pt1Output)
 
-    println("processing invalid input")
     val invalidOutput = invalidInput.countValidPassports { it.validateKeys() && it.validateFields() }
     assertEquals(0, invalidOutput)
 
-    println("processing valid input")
     val validOutput = validInput.countValidPassports { it.validateKeys() && it.validateFields() }
     assertEquals(4, validOutput)
 
-    println("processing pt2")
     val pt2Output = input.countValidPassports { it.validateKeys() && it.validateFields() }
-    println(pt2Output)
+    assertEquals(175, pt2Output)
 }

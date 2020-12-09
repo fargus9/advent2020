@@ -30,7 +30,7 @@ fun String.collectGroupAnswers(defaultAnswers:Answers = setOf(), combine: (Answe
         groupList.also { it.add(groupAnswers) }
     }
 
-fun defaultAnswers(): Answers = 'a'.rangeTo('z').toMutableSet()
+fun defaultAnswers(): Answers = ('a'..'z').toMutableSet()
 fun String.collectCommonGroupAnswers() = collectGroupAnswers { answers, line -> answers.plus(line) }
 fun String.collectUnanimousGroupAnswers() = collectGroupAnswers(defaultAnswers()) { answers, line -> answers.intersect(line) }
 
@@ -44,12 +44,10 @@ fun main() {
     assertEquals(11, testAnswers.sumBy { it.size })
 
     val pt1 = input.collectCommonGroupAnswers().sumBy { it.size }
-    println(pt1)
     assertEquals(6585, pt1)
 
     assertEquals(6, sample.collectUnanimousGroupAnswers().sumBy { it.size })
 
     val pt2 = input.collectUnanimousGroupAnswers().sumBy { it.size }
-    println(pt2)
     assertEquals(3276, pt2)
 }

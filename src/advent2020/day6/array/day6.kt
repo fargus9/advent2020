@@ -20,7 +20,7 @@ a
 b"""
 
 typealias Answers = Array<Boolean?>
-val alphabet = 'a'.rangeTo('z')
+val alphabet = 'a'..'z'
 fun defaultAnswers(initializer: (Int) -> Boolean? = { false }): Answers = Array(alphabet.count(), initializer)
 fun String.collectGroupAnswers(combine: (Answers, String) -> Answers): MutableList<Answers> = lineSequence()
     .fold(mutableListOf(defaultAnswers())) { groupList, line ->

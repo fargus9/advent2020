@@ -23,9 +23,7 @@ class Program(input: String) {
     var accumulator = 0
 
     fun executeUntilVisited(numberOfTimes: Int) {
-        while (visited[programCounter] < numberOfTimes) {
-            programCounter = executeLine()
-        }
+        while (visited[programCounter] < numberOfTimes) { programCounter = executeLine() }
     }
 
     private fun String.rewriteInstruction(): String = with (split(" ")) {

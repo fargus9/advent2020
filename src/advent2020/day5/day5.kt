@@ -11,7 +11,7 @@ val IntRange.half
 val IntRange.lowerHalf
     get() = first until first + half
 val IntRange.upperHalf
-    get() = (first + half).rangeTo(last)
+    get() = (first + half)..last
 
 typealias Directions = Sequence<Char>
 tailrec fun findIndex(range: IntRange, directions: Directions, predicate: (Char) -> Boolean): Int {
@@ -23,8 +23,8 @@ tailrec fun findIndex(range: IntRange, directions: Directions, predicate: (Char)
     }
 }
 
-val rowsOfPlane = 0.rangeTo(127)
-val seatsOfPlane = 0.rangeTo(7)
+val rowsOfPlane = 0..127
+val seatsOfPlane = 0..7
 fun seatIdOf(row: Int, seat: Int) = row * 8 + seat
 typealias Seat = Triple<Int, Int, Int>
 fun Directions.findSeat(): Seat {
@@ -37,15 +37,15 @@ fun Directions.findSeat(): Seat {
 fun Directions.findSeatId(): Int = findSeat().third
 
 fun main() {
-    assertEquals(0.rangeTo(63), 0.rangeTo(127).lowerHalf)
-    assertEquals(32.rangeTo(63), 0.rangeTo(63).upperHalf)
-    assertEquals(32.rangeTo(47), 32.rangeTo(63).lowerHalf)
-    assertEquals(40.rangeTo(47), 32.rangeTo(47).upperHalf)
-    assertEquals(44.rangeTo(47), 40.rangeTo(47).upperHalf)
-    assertEquals(44.rangeTo(45), 44.rangeTo(47).lowerHalf)
+    assertEquals(0..63, (0..127).lowerHalf)
+    assertEquals(32..63, (0..63).upperHalf)
+    assertEquals(32..47, (32..63).lowerHalf)
+    assertEquals(40..47, (32..47).upperHalf)
+    assertEquals(44..47, (40..47).upperHalf)
+    assertEquals(44..45, (44..47).lowerHalf)
 
-    assertEquals(4.rangeTo(7), 0.rangeTo(7).upperHalf)
-    assertEquals(4.rangeTo(5), 4.rangeTo(7).lowerHalf)
+    assertEquals(4..7, (0..7).upperHalf)
+    assertEquals(4..5, (4..7).lowerHalf)
 
     with (testPass1.asSequence()) {
         val (row, seat, id) = findSeat()
@@ -72,7 +72,7 @@ fun main() {
     assertEquals(820, testOutput)
 
     val pt1 = input.splitToSequence("\n").map { it.asSequence().findSeatId() }.max()
-    println(pt1)
+    assertEquals(838, pt1)
 
     val seatIds = Array(128) { arrayOfNulls<Int>(8) }
     input.splitToSequence("\n").map { it.asSequence().findSeat() }.forEach { (row, seat, id) ->
@@ -82,5 +82,5 @@ fun main() {
     val projectedRow = seatIds.indexOfFirst { seats -> seats.count { it == null } == 1 }
     val projectedSeat = seatIds[projectedRow].indexOf(null)
     val projectedSeatId = seatIdOf(projectedRow, projectedSeat)
-    println("row: $projectedRow seat: $projectedSeat id: $projectedSeatId")
+    assertEquals(714, projectedSeatId)
 }
