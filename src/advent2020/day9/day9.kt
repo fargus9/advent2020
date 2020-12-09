@@ -25,14 +25,14 @@ const val sample = """35
 
 // A slight tweak on the solution from day 1 pt1
 typealias Values = Array<Long>
-tailrec fun findNUmberBySummingTwo(values: Values, lower: Int, upper: Int, search: Long): Boolean {
+tailrec fun findNumberBySummingTwo(values: Values, lower: Int, upper: Int, search: Long): Boolean {
     val lowerValue = values[lower]
     val upperValue = values[upper]
     val sum = lowerValue + upperValue
     return when {
         upper == lower && sum != search -> false
-        sum > search -> findNUmberBySummingTwo(values, lower, upper - 1, search)
-        sum < search -> findNUmberBySummingTwo(values, lower + 1, upper, search)
+        sum > search -> findNumberBySummingTwo(values, lower, upper - 1, search)
+        sum < search -> findNumberBySummingTwo(values, lower + 1, upper, search)
         sum == search -> true
         else -> false
     }
@@ -47,7 +47,7 @@ fun Values.findFirstRuleBreaker(taking: Int): Long {
     do {
         search = lower + taking
         val consider = takingSubset(lower, taking).sorted().toList().toTypedArray()
-        foundValue = findNUmberBySummingTwo(consider,0, consider.lastIndex, this[search])
+        foundValue = findNumberBySummingTwo(consider,0, consider.lastIndex, this[search])
         lower += 1
     } while (foundValue && (lower + taking) < lastIndex)
     return this[search]
