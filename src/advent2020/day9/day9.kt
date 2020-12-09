@@ -53,26 +53,26 @@ fun Values.findFirstRuleBreaker(taking: Int): Long {
     return this[search]
 }
 
-fun findRangeBySumming(values: Values, search: Long): Long {
+fun Values.findRangeBySumming(search: Long): Long {
     var lower = 0
     var considering: Int
     var nextToConsider = 2
-    var runningTotal = values[0] + values[1]
+    var runningTotal = this[0] + this[1]
     do {
         considering = nextToConsider
         runningTotal += if (runningTotal > search) {
             lower += 1
-            -values[lower - 1]
+            -this[lower - 1]
         } else {
             nextToConsider += 1
-            values[considering]
+            this[considering]
         }
         if (runningTotal == 0L) {
             nextToConsider = lower + 1
         }
-    } while (nextToConsider < values.lastIndex && runningTotal != search)
-    val range = values.asSequence().drop(lower).take(considering - lower)
-    return range.minOf { it } + range.maxOf { it }
+    } while (nextToConsider < lastIndex && runningTotal != search)
+
+    return asSequence().drop(lower).take(considering - lower).run { minOf { it } + maxOf { it } }
 }
 
 fun main() {
@@ -84,9 +84,9 @@ fun main() {
     val pt1Output = values.findFirstRuleBreaker(25)
     assertEquals(2089807806L, pt1Output)
 
-    val sampleOutput2 = findRangeBySumming(sampleValues, 127L)
+    val sampleOutput2 = sampleValues.findRangeBySumming(127L)
     assertEquals(62L, sampleOutput2)
 
-    val pt2Output = findRangeBySumming(values, 2089807806L)
+    val pt2Output = values.findRangeBySumming(2089807806L)
     assertEquals(245848639, pt2Output)
 }
