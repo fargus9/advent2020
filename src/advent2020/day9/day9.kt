@@ -38,7 +38,7 @@ tailrec fun findNUmberBySummingTwo(values: Values, lower: Int, upper: Int, searc
     }
 }
 
-fun Values.takingSubset(drop: Int, taking: Int) = asSequence().drop(drop).take(taking).sorted().toList().toTypedArray()
+fun Values.takingSubset(drop: Int, taking: Int) = asSequence().drop(drop).take(taking)
 
 fun Values.findFirstRuleBreaker(taking: Int): Long {
     var lower = 0
@@ -46,7 +46,7 @@ fun Values.findFirstRuleBreaker(taking: Int): Long {
     var foundValue: Boolean
     do {
         search = lower + taking
-        val consider = takingSubset(lower, taking)
+        val consider = takingSubset(lower, taking).sorted().toList().toTypedArray()
         foundValue = findNUmberBySummingTwo(consider,0, consider.lastIndex, this[search])
         lower += 1
     } while (foundValue && (lower + taking) < lastIndex)
@@ -55,24 +55,22 @@ fun Values.findFirstRuleBreaker(taking: Int): Long {
 
 fun Values.findRangeBySumming(search: Long): Long {
     var lower = 0
-    var considering: Int
-    var nextToConsider = 2
+    var considering = 2
     var runningTotal = this[0] + this[1]
-    do {
-        considering = nextToConsider
-        runningTotal += if (runningTotal > search) {
+    while (runningTotal != search) {
+        if (runningTotal > search) {
+            runningTotal -= this[lower]
             lower += 1
-            -this[lower - 1]
         } else {
-            nextToConsider += 1
-            this[considering]
+            runningTotal += this[considering]
+            considering += 1
         }
         if (runningTotal == 0L) {
-            nextToConsider = lower + 1
+            considering = lower + 1
         }
-    } while (nextToConsider < lastIndex && runningTotal != search)
+    }
 
-    return asSequence().drop(lower).take(considering - lower).run { minOf { it } + maxOf { it } }
+    return takingSubset(lower, considering - lower).run { minOf { it } + maxOf { it } }
 }
 
 fun main() {
