@@ -20,11 +20,10 @@ val matchCache = mutableMapOf<Pair<Int, Int>, Long>()
 fun findValidCombinations(consider: Joltage, considering: Int, target: Int): Long {
     val leastPossible = consider.indexOfFirst { (target - it) <= 3 }
     if (leastPossible == -1) { return if (target <= 3) 1L else 0L }
-    return (((leastPossible..considering).asSequence()
+    return (leastPossible..considering).asSequence()
         .map { it - 1 to consider.elementAt(it) }
-        .map { (nowConsidering, newTarget) -> findValidCombinations(consider, nowConsidering, newTarget) })
-            + sequenceOf(if (target <= 3) 1L else 0L ))
-        .sum()
+        .map { (nowConsidering, newTarget) -> findValidCombinations(consider, nowConsidering, newTarget) }
+        .sum() + if (target <= 3) 1L else 0L
 }
 
 fun main() {
