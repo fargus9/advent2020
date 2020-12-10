@@ -17,11 +17,11 @@ fun JoltDistribution.product() = asSequence().map { (_, count) -> count }.reduce
 
 typealias Joltage = Array<Int>
 val matchCache = mutableMapOf<Pair<Int, Int>, Long>()
-fun findValidCombinations(consider: Joltage, considering: Int, target: Int): Long {
+fun findValidCombinations(consider: Joltage, considering: Int, target: Int): Long = matchCache.getOrPut(considering to target) {
     val leastPossible = consider.indexOfFirst { (target - it) <= 3 }
     if (leastPossible == -1) { return if (target <= 3) 1L else 0L }
     return (leastPossible..considering).asSequence()
-        .map { it - 1 to consider.elementAt(it) }
+        .map { it - 1 to consider[it] }
         .map { (nowConsidering, newTarget) -> findValidCombinations(consider, nowConsidering, newTarget) }
         .sum() + if (target <= 3) 1L else 0L
 }
