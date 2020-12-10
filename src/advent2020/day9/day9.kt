@@ -39,6 +39,14 @@ tailrec fun findNumberBySummingTwo(values: Values, lower: Int, upper: Int, searc
 }
 
 fun Values.takingSubset(drop: Int, taking: Int) = asSequence().drop(drop).take(taking)
+typealias Subset = Pair<Sequence<Long>, Long>
+fun Values.rollingSubsets(taking: Int): Sequence<Subset> = sequence {
+    (0..lastIndex - taking).forEach { yield(takingSubset(it, taking) to this@rollingSubsets[it + taking]) }
+}
+
+fun Values.findFirst(taking: Int): Long = rollingSubsets(taking).first { (values, search) ->
+    values.sorted().toList().toTypedArray().let { !findNumberBySummingTwo(it, 0, it.lastIndex, search) }
+}.second
 
 fun Values.findFirstRuleBreaker(taking: Int): Long {
     var lower = 0
@@ -77,10 +85,12 @@ fun main() {
     val sampleValues = sample.lineSequence().map { it.toLong() }.toList().toTypedArray()
     val sampleOutput = sampleValues.findFirstRuleBreaker(5)
     assertEquals(127L, sampleOutput)
+    assertEquals(127L, sampleValues.findFirst(5))
 
     val values = input.lineSequence().map { it.toLong() }.toList().toTypedArray()
     val pt1Output = values.findFirstRuleBreaker(25)
     assertEquals(2089807806L, pt1Output)
+    assertEquals(2089807806L, values.findFirst(25))
 
     val sampleOutput2 = sampleValues.findRangeBySumming(127L)
     assertEquals(62L, sampleOutput2)
