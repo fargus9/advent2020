@@ -26,18 +26,27 @@ fun findValidCombinations(consider: Joltage, considering: Int, target: Int): Lon
         .sum() + if (target <= 3) 1L else 0L
 }
 
-fun findFromBottom(consider: Joltage, target: Int): Long = sequence {
+fun findFromBottom(values: Joltage, target: Int): Long = sequence {
+    val consider = arrayOf(0) + values + arrayOf(target)
     var considering = 0
-    var compare = 0
-    yield(1)
-    while (considering < consider.count() && compare < target) {
-        val values = consider.asSequence().drop(considering).takeWhile { it - compare <= 3 }
-        val count = values.count().takeUnless { it == 1 } ?: 0
-        yield(count.toLong())
-        considering += 1
-        compare = values.firstOrNull() ?: target
+    var from = 0
+    while (considering < consider.lastIndex) {
+        val lastFit = consider.indexOfLast { it - from <= 3 }
+        var count = when (lastFit - considering) {
+            3 -> 6L
+            2 -> 3L
+            else -> 1
+        }
+        while (considering < lastFit) {
+            considering += 1
+            from = consider[considering]
+            if (consider.indexOfLast { it - from <= 3 } == lastFit && considering != lastFit) {
+                count -= 1
+            }
+        }
+        yield(count)
     }
-}.reduce { total, count -> total + count }
+}.reduce { total, count -> total * count }
 
 fun main() {
     val smallJolts = sample1.toJolts()
@@ -53,14 +62,14 @@ fun main() {
     assertEquals(2346, pt1Output)
 
     val smallCombinations = with (smallJolts.toList().toTypedArray()) {
-        //assertEquals(8L, findFromBottom(this, last() + 3))
+        assertEquals(8L, findFromBottom(this, last() + 3))
         findValidCombinations(this, lastIndex, last() + 3)
     }
     assertEquals(8L, smallCombinations)
     cache.clear()
 
     val largeCombinations = with (largeJolts.toList().toTypedArray()) {
-        ///assertEquals(19208L, findFromBottom(this, last() + 3))
+        assertEquals(19208L, findFromBottom(this, last() + 3))
         findValidCombinations(this, lastIndex,last() + 3)
     }
     assertEquals(19208L, largeCombinations)
