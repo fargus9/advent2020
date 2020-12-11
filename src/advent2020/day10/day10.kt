@@ -26,25 +26,35 @@ fun findValidCombinations(consider: Joltage, considering: Int, target: Int): Lon
         .sum() + if (target <= 3) 1L else 0L
 }
 
+fun Joltage.indexOfLastFrom(from: Int, predicate: (Int) -> Boolean): Int {
+    for (index in (from..lastIndex).reversed()) {
+        if (predicate(this[index])) {
+            return index
+        }
+    }
+    return -1
+}
 fun findFromBottom(values: Joltage, target: Int): Long = sequence {
     val consider = arrayOf(0) + values + arrayOf(target)
     var considering = 0
     var from = 0
-    while (considering < consider.lastIndex) {
-        val lastFit = consider.indexOfLast { it - from <= 3 }
-        var count = when (lastFit - considering) {
-            3 -> 6L
+    while (from < target) {
+        val lastFit = consider.indexOfLastFrom(considering) { it - from <= 3 }
+        var combos = when (lastFit - considering) {
+            3 -> 7L
             2 -> 3L
             else -> 1
         }
+        var reduce = 1
         while (considering < lastFit) {
             considering += 1
             from = consider[considering]
-            if (consider.indexOfLast { it - from <= 3 } == lastFit && considering != lastFit) {
-                count -= 1
+            if (considering != lastFit && consider.indexOfLastFrom(considering) { it - from <= 3 } <= lastFit) {
+                combos -= reduce
             }
+            reduce += 1
         }
-        yield(count)
+        yield(combos)
     }
 }.reduce { total, count -> total * count }
 
@@ -76,7 +86,7 @@ fun main() {
     cache.clear()
 
     val pt2output = with (inputJolts.toList().toTypedArray()) {
-        findValidCombinations(this, lastIndex,last() + 3)
+        findFromBottom(this,last() + 3)
     }
     println(pt2output)
 }
