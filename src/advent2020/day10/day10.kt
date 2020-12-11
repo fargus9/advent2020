@@ -34,6 +34,7 @@ fun Joltage.indexOfLastFrom(from: Int, predicate: (Int) -> Boolean): Int {
     }
     return -1
 }
+
 fun findFromBottom(values: Joltage, target: Int): Long = sequence {
     val consider = arrayOf(0) + values + arrayOf(target)
     var considering = 0
@@ -85,8 +86,6 @@ fun main() {
     assertEquals(19208L, largeCombinations)
     cache.clear()
 
-    val pt2output = with (inputJolts.toList().toTypedArray()) {
-        findFromBottom(this,last() + 3)
-    }
-    println(pt2output)
+    val pt2output = with (inputJolts.toList().toTypedArray()) { findFromBottom(this,last() + 3) }
+    assertEquals(6044831973376, pt2output)
 }
