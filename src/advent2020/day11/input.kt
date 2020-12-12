@@ -63,18 +63,8 @@ L.#.L..#..
 #.#L#L#.##"""
 )
 
-val largeTestPasses = arrayOf("""L.LL.LL.LL
-LLLLLLL.LL
-L.L.L..L..
-LLLL.LL.LL
-L.LL.LL.LL
-L.LLLLL.LL
-..L.L.....
-LLLLLLLLLL
-L.LLLLLL.L
-L.LLLLL.LL
-#.##.##.##""",
-"""#######.##
+val largeTestPasses = arrayOf("""#.##.##.##
+#######.##
 #.#.#..#..
 ####.##.##
 #.##.##.##
@@ -82,9 +72,9 @@ L.LLLLL.LL
 ..#.#.....
 ##########
 #.######.#
-#.#####.##
-#.LL.LL.L#""",
-"""#LLLLLL.LL
+#.#####.##""",
+"""#.LL.LL.L#
+#LLLLLL.LL
 L.L.L..L..
 LLLL.LL.LL
 L.LL.LL.LL
@@ -92,9 +82,9 @@ L.LLLLL.LL
 ..L.L.....
 LLLLLLLLL#
 #.LLLLLL.L
-#.LLLLL.L#
-#.L#.##.L#""",
-"""#L#####.LL
+#.LLLLL.L#""",
+"""#.L#.##.L#
+#L#####.LL
 L.#.#..#..
 ##L#.##.##
 #.##.#L.##
@@ -102,9 +92,9 @@ L.#.#..#..
 ..#.#.....
 LLL####LL#
 #.L#####.L
-#.L####.L#
-#.L#.L#.L#""",
-"""#LLLLLL.LL
+#.L####.L#""",
+"""#.L#.L#.L#
+#LLLLLL.LL
 L.L.L..#..
 ##LL.LL.L#
 L.LL.LL.L#
@@ -112,9 +102,9 @@ L.LL.LL.L#
 ..L.L.....
 LLLLLLLLL#
 #.LLLLL#.L
-#.L#LL#.L#
-#.L#.L#.L#""",
-"""#LLLLLL.LL
+#.L#LL#.L#""",
+"""#.L#.L#.L#
+#LLLLLL.LL
 L.L.L..#..
 ##L#.#L.L#
 L.L#.#L.L#
@@ -122,9 +112,9 @@ L.L#.#L.L#
 ..#.#.....
 LLL###LLL#
 #.LLLLL#.L
-#.L#LL#.L#
-#.L#.L#.L#""",
-"""#LLLLLL.LL
+#.L#LL#.L#""",
+"""#.L#.L#.L#
+#LLLLLL.LL
 L.L.L..#..
 ##L#.#L.L#
 L.L#.LL.L#
