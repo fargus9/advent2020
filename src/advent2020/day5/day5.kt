@@ -68,10 +68,10 @@ fun main() {
         assertEquals(820, id)
     }
 
-    val testOutput = sequenceOf(testPass1, testPass2, testPass3).map { it.asSequence().findSeatId() }.max()
+    val testOutput = sequenceOf(testPass1, testPass2, testPass3).map { it.asSequence().findSeatId() }.maxOf { it }
     assertEquals(820, testOutput)
 
-    val pt1 = input.splitToSequence("\n").map { it.asSequence().findSeatId() }.max()
+    val pt1 = input.splitToSequence("\n").map { it.asSequence().findSeatId() }.maxOf { it }
     assertEquals(838, pt1)
 
     val seatIds = Array(128) { arrayOfNulls<Int>(8) }

@@ -1,7 +1,5 @@
 package advent2020.day11
 
-import java.lang.Integer.max
-import java.lang.Math.min
 import kotlin.test.assertEquals
 
 fun CharArray.indexOfFirstFrom(from: Int, predicate: (Char) -> Boolean): Int {
@@ -19,19 +17,13 @@ class Seats(input: String) {
     private var seats: CharArray
     private var rowSize: Int = input.indexOfFirst { it == '\n' } + 2
     private val surrounding = arrayOf(-1, 1, -(rowSize + 1), -rowSize, -(rowSize -1), rowSize + 1, rowSize, rowSize - 1)
-    private val vertical: IntArray
-    private val horizontal: IntArray
-    private val increasing: IntArray
-    private val decreasing: IntArray
+    private val occupiedSeatsInSight: IntArray
 
     init {
         val padded = emptyRow(rowSize) + input.lineSequence().map { ".$it." }.toList() + emptyRow(rowSize)
         seats = padded.joinToString("").toCharArray()
         nextState = seats.copyOf()
-        vertical = IntArray(rowSize)
-        horizontal = IntArray(rowSize)
-        increasing = IntArray(rowSize * 2)
-        decreasing = IntArray( rowSize * 2)
+        occupiedSeatsInSight = IntArray(seats.size)
     }
 
     private fun applyRules(flip: OccupancyRules): Boolean {
@@ -84,40 +76,71 @@ class Seats(input: String) {
     private val lineOfSightRules: OccupancyRules = { value, considering ->
         when (value) {
             'L' -> if (occupiedLineOfSightTo(considering) == 0) '#' else null
-            // this is because a filled seat itself accounts for 4 using this algorithm
-            '#' -> if (occupiedLineOfSightTo(considering) > 8) 'L' else null
+            '#' -> if (occupiedLineOfSightTo(considering) > 4) 'L' else null
             else -> null
         }
     }
 
-    private fun occupiedLineOfSightTo(seat: Int) = seat.seatSlopeIndices.let{ (columnIndex, rowIndex, diagonalIndex) ->
-        vertical[columnIndex].coerceAtMost(3) +
-                horizontal[rowIndex].coerceAtMost(3) +
-                increasing[diagonalIndex].coerceAtMost(3) +
-                decreasing[diagonalIndex].coerceAtMost(3)
-    }
+    private fun occupiedLineOfSightTo(seat: Int) = occupiedSeatsInSight[seat]
 
-    private val Int.seatSlopeIndices: Array<Int>
-        get() {
-            val columnIndex = this % rowSize
-            val rowIndex = this / rowSize
-            val decreasingIndex  = rowIndex - columnIndex + rowSize
-            val increasingIndex  = columnIndex - rowIndex + rowSize
-            return arrayOf(columnIndex, rowIndex, decreasingIndex, increasingIndex)
-        }
-    
     fun applyLineOfSightRules(): Boolean {
-        sequenceOf(vertical, horizontal, increasing, decreasing).forEach { it.reset() }
-        var considering = seats.indexOfFirst { it == '#' }
+        var considering = seats.indexOfFirst { it != '.' }
         val seatRange = seats.indices
         while (considering in seatRange) {
-            val (columnIndex, rowIndex, decreasingIndex, increasingIndex) = considering.seatSlopeIndices
-            vertical[columnIndex] += 1
-            horizontal[rowIndex] += 1
-            decreasing[decreasingIndex] += 1
-            increasing[increasingIndex] += 1
-
-            considering = seats.indexOfFirstFrom(considering + 1) { it == '#'}
+            var sighted = 0
+            // could potentially short-circuit each search by looking for || (occupiedSeatsInSight[<value>] == 8
+            // && seats[considering] == 'L') - not a big win I think
+            for (i in (considering - rowSize).downTo(considering % rowSize) step rowSize) {
+                if (seats[i] == '#') {
+                    sighted += 1
+                    break
+                }
+            }
+            for (i in (considering + rowSize).until(seats.size - considering % rowSize) step rowSize) {
+                if (seats[i] == '#') {
+                    sighted += 1
+                    break
+                }
+            }
+            for (i in 1..(considering % rowSize)) {
+                if (seats[considering - i] == '#') {
+                    sighted += 1
+                    break
+                }
+            }
+            for (i in 1.until(rowSize - considering % rowSize)) {
+                if (seats[considering + i] == '#') {
+                    sighted += 1
+                    break
+                }
+            }
+            for (i in (considering - rowSize - 1).downTo(0) step rowSize + 1) {
+                if (seats[i] == '#') {
+                    sighted += 1
+                    break
+                }
+            }
+            for (i in (considering + rowSize + 1).until(seats.lastIndex) step rowSize + 1) {
+                if (seats[i] == '#') {
+                    sighted += 1
+                    break
+                }
+            }
+            // bounds are WRONG
+            for (i in (rowSize - 1)..( rowSize - (considering / rowSize)) step rowSize - 1) {
+                if (seats[considering + i] == '#') {
+                    sighted += 1
+                    break
+                }
+            }
+            for (i in (considering - rowSize + 1).downTo(rowSize - 1) step rowSize + 1) {
+                if (seats[i] == '#') {
+                    sighted += 1
+                    break
+                }
+            }
+            occupiedSeatsInSight[considering] = sighted
+            considering = seats.indexOfFirstFrom(considering + 1) { it != '.' }
         }
         return applyRules(lineOfSightRules)
     }
