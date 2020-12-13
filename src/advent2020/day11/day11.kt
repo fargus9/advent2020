@@ -1,5 +1,6 @@
 package advent2020.day11
 
+import kotlin.math.max
 import kotlin.test.assertEquals
 
 fun CharArray.indexOfFirstFrom(from: Int, predicate: (Char) -> Boolean): Int {
@@ -15,12 +16,19 @@ typealias OccupancyRules = Seats.(Char, Int) -> Char?
 class Seats(input: String) {
     private var nextState: CharArray
     private var seats: CharArray
-    private var rowSize: Int = input.indexOfFirst { it == '\n' } + 2
-    private val surrounding = arrayOf(-1, 1, -(rowSize + 1), -rowSize, -(rowSize -1), rowSize + 1, rowSize, rowSize - 1)
+    private var rowSize: Int
+    private val surrounding: Array<Int>
     private val occupiedSeatsInSight: IntArray
 
     init {
-        val padded = emptyRow(rowSize) + input.lineSequence().map { ".$it." }.toList() + emptyRow(rowSize)
+        val inputSequence = input.lineSequence()
+        val rowCount = inputSequence.count()
+        val actualRowSize = input.indexOfFirst { it == '\n' }
+        val squareSize = max(rowCount, actualRowSize) + 2
+        val paddingCount = (squareSize - rowCount) / 2
+        rowSize = squareSize
+        surrounding = arrayOf(-1, 1, -(rowSize + 1), -rowSize, -(rowSize -1), rowSize + 1, rowSize, rowSize - 1)
+        val padded = List(paddingCount) { emptyRow(rowSize) } + inputSequence.map { ".$it." }.toList() + List(paddingCount) { emptyRow(rowSize) }
         seats = padded.joinToString("").toCharArray()
         nextState = seats.copyOf()
         occupiedSeatsInSight = IntArray(seats.size)
@@ -90,54 +98,113 @@ class Seats(input: String) {
             var sighted = 0
             // could potentially short-circuit each search by looking for || (occupiedSeatsInSight[<value>] == 8
             // && seats[considering] == 'L') - not a big win I think
-            for (i in (considering - rowSize).downTo(considering % rowSize) step rowSize) {
-                if (seats[i] == '#') {
-                    sighted += 1
-                    break
+            val row = considering / rowSize
+            val col = considering % rowSize
+
+            // slope is 0, -1
+            var y = row - 1
+            while (y > 0) {
+                when (seats[y * rowSize + col]) {
+                    '#' -> {
+                        sighted += 1
+                        break
+                    }
+                    'L' -> break
                 }
+                y -= 1
             }
-            for (i in (considering + rowSize).until(seats.size - considering % rowSize) step rowSize) {
-                if (seats[i] == '#') {
-                    sighted += 1
-                    break
+            // slope is 0, 1
+            y = row + 1
+            while (y < rowSize) {
+                when (seats[y * rowSize + col]) {
+                    '#' -> {
+                        sighted += 1
+                        break
+                    }
+                    'L' -> break
                 }
+                y += 1
             }
-            for (i in 1..(considering % rowSize)) {
-                if (seats[considering - i] == '#') {
-                    sighted += 1
-                    break
+            // slope is -1, 0
+            var x = col - 1
+            while (x > 0) {
+                when (seats[row * rowSize + x]) {
+                    '#' -> {
+                        sighted += 1
+                        break
+                    }
+                    'L' -> break
                 }
+                x -= 1
             }
-            for (i in 1.until(rowSize - considering % rowSize)) {
-                if (seats[considering + i] == '#') {
-                    sighted += 1
-                    break
+            // slope is 1, 0
+            x = col + 1
+            while (x < rowSize) {
+                when (seats[row * rowSize + x]) {
+                    '#' -> {
+                        sighted += 1
+                        break
+                    }
+                    'L' -> break
                 }
+                x += 1
             }
-            for (i in (considering - rowSize - 1).downTo(0) step rowSize + 1) {
-                if (seats[i] == '#') {
-                    sighted += 1
-                    break
+            // slope is -1, -1
+            x = col - 1
+            y = row - 1
+            while (x > 0 && y > 0) {
+                when (seats[y * rowSize + x]) {
+                    '#' -> {
+                        sighted += 1
+                        break
+                    }
+                    'L' -> break
                 }
+                x -= 1
+                y -= 1
             }
-            for (i in (considering + rowSize + 1).until(seats.lastIndex) step rowSize + 1) {
-                if (seats[i] == '#') {
-                    sighted += 1
-                    break
+            // slope is 1, 1
+            x = col + 1
+            y = row + 1
+            while (x < rowSize && y < rowSize) {
+                when (seats[y * rowSize + x]) {
+                    '#' -> {
+                        sighted += 1
+                        break
+                    }
+                    'L' -> break
                 }
+                x += 1
+                y += 1
             }
-            // bounds are WRONG
-            for (i in (rowSize - 1)..( rowSize - (considering / rowSize)) step rowSize - 1) {
-                if (seats[considering + i] == '#') {
-                    sighted += 1
-                    break
+            // slope is -1, 1
+            x = col - 1
+            y = row + 1
+            while (x > 0 && y < rowSize) {
+                when (seats[y * rowSize + x]) {
+                    '#' -> {
+                        sighted += 1
+                        break
+                    }
+                    'L' -> break
                 }
+                x -= 1
+                y += 1
             }
-            for (i in (considering - rowSize + 1).downTo(rowSize - 1) step rowSize + 1) {
-                if (seats[i] == '#') {
-                    sighted += 1
-                    break
+
+            // slope is 1, -1
+            x = col + 1
+            y = row - 1
+            while (x < rowSize && y > 0) {
+                when (seats[y * rowSize + x]) {
+                    '#' -> {
+                        sighted += 1
+                        break
+                    }
+                    'L' -> break
                 }
+                x += 1
+                y -= 1
             }
             occupiedSeatsInSight[considering] = sighted
             considering = seats.indexOfFirstFrom(considering + 1) { it != '.' }
@@ -146,13 +213,7 @@ class Seats(input: String) {
     }
 
     companion object {
-        fun emptyRow(rowSize: Int) = listOf(CharArray(rowSize) { '.' }.joinToString(""))
-    }
-}
-
-private fun IntArray.reset() {
-    for (i in indices) {
-        this[i] = 0
+        fun emptyRow(rowSize: Int) = CharArray(rowSize) { '.' }.joinToString("")
     }
 }
 
@@ -181,5 +242,5 @@ fun main() {
 
     val lineOfSightSeats = Seats(input)
     lineOfSightSeats.settleLineOfSight()
-    println(lineOfSightSeats.occupiedCount)
+    assertEquals(1986, lineOfSightSeats.occupiedCount)
 }
