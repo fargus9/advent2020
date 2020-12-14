@@ -48,10 +48,12 @@ class DockingAddressProgram(input: String): Program(input) {
 
     fun execute() = program.forEach {
         it.toMask()?.let { value -> mask = value }
-        it.toMemAccess()?.let { (address, value) ->
-            storeValueUsingMask(0, address, value)
-        }
+        it.toMemAccess()?.let { (address, value) -> storeValueUsingMask(0, address, value) }
     }
+
+    private fun Long.flipBitToZero(shift: Int) = this and (0b1L shl shift).inv()
+
+    private fun Long.flipBitToOne(shift: Int) = this or (0b1L shl shift)
 
     private fun storeValueUsingMask(mostSignificantBit: Int, address: Long, value: Long) {
         if (mostSignificantBit > mask.lastIndex) {
@@ -60,17 +62,13 @@ class DockingAddressProgram(input: String): Program(input) {
         }
         val nextSignificantBit = mostSignificantBit + 1
         val shift = mask.lastIndex - mostSignificantBit
-        val newAddress = when (mask[mostSignificantBit]) {
-            'X' -> {
-                val forcedZeroBit = address and (0b1L shl shift).inv()
-                storeValueUsingMask(nextSignificantBit, forcedZeroBit, value)
-                address or (0b1L shl shift)
-            }
-            '0' -> address
-            '1' -> address or (0b1L shl shift)
+        val newAddresses = when (mask[mostSignificantBit]) {
+            'X' -> arrayOf(address.flipBitToOne(shift), address.flipBitToZero(shift))
+            '0' -> arrayOf(address)
+            '1' -> arrayOf(address.flipBitToOne(shift))
             else -> throw IllegalStateException("Expected valid mask character")
         }
-        storeValueUsingMask(nextSignificantBit, newAddress, value)
+        newAddresses.forEach { storeValueUsingMask(nextSignificantBit, it, value) }
     }
 }
 
