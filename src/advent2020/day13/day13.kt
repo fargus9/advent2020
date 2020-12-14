@@ -1,6 +1,5 @@
 package advent2020.day13
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import kotlin.test.assertEquals
 
 typealias DepartingBus = Pair<Int, Int>
@@ -34,20 +33,26 @@ class StaggeredSchedule(input: String) {
 
     fun nextStaggeredArrivalStartTime(): Long {
         val firstId = ids.first().first.toLong()
-        val maxId = ids.maxOf { it.second }.toLong()
-        val increment = (maxId / firstId + 1) * firstId
+        var increment = firstId
         var checkFirst = firstId
+        var matchLength = 0
+        var highestMatchLength = 0
         do {
+            if (matchLength > highestMatchLength) {
+                increment *= ids[matchLength].first
+                highestMatchLength = matchLength
+            }
             checkFirst += increment
-        } while (!checkNextValue(checkFirst, 1))
+            matchLength = checkNextValue(checkFirst, 1)
+        } while (matchLength <= ids.lastIndex)
         return checkFirst
     }
 
-    private tailrec fun checkNextValue(check: Long, index: Int): Boolean {
-        if (index > ids.lastIndex) { return true }
+    private tailrec fun checkNextValue(check: Long, index: Int): Int {
+        if (index > ids.lastIndex) { return index }
         val (id, offset) = ids[index]
         val nextStep = (check / id + 1) * id
-        return if (check + offset == nextStep) { checkNextValue(check, index + 1) } else { false }
+        return if (check + offset == nextStep) { checkNextValue(check, index + 1) } else { index - 1 }
     }
 }
 
@@ -65,6 +70,9 @@ fun main() {
         assertEquals(value.second, test1.nextStaggeredArrivalStartTime(), "$test failed")
     }
 
-    val pt2Test = StaggeredSchedule(input.lineSequence().last()).nextStaggeredArrivalStartTime()
-    println(pt2Test)
+    val pt2SampleTest = StaggeredSchedule(samplePt1.lineSequence().last()).nextStaggeredArrivalStartTime()
+    assertEquals(1068781, pt2SampleTest)
+
+    val pt2Output = StaggeredSchedule(input.lineSequence().last()).nextStaggeredArrivalStartTime()
+    println(pt2Output)
 }
