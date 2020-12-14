@@ -6,12 +6,12 @@ import kotlin.test.assertNotEquals
 
 sealed class Program(input: String) {
     protected val program: Sequence<String> = input.lineSequence()
-    protected var memory = mutableMapOf<Int, Long>().withDefault { 0 }
+    protected var memory = mutableMapOf<Long, Long>().withDefault { 0 }
 
     fun String.toMask(): String? = "^mask = ([01X]+)$".toRegex().find(this)?.destructured?.let { (value) -> value }
 
-    fun String.toMemAccess(): Pair<Int, Long>? = "^mem\\[([0-9]+)] = ([0-9]+)$".toRegex().find(this)?.destructured
-        ?.let { (idx, value) -> idx.toInt() to value.toLong() }
+    fun String.toMemAccess(): Pair<Long, Long>? = "^mem\\[([0-9]+)] = ([0-9]+)$".toRegex().find(this)?.destructured
+        ?.let { (address, value) -> address.toLong() to value.toLong() }
 
     fun sumOfValuesInMemory() = memory.asSequence().sumOf { (_, value) -> value }
 }
@@ -24,7 +24,7 @@ class DockingProgram(input: String): Program(input) {
             masks = value.asSequence().fold(LongArray(2)) { masks, bit ->
                 when (bit) {
                     'X' -> {
-                        masks[0] = (masks[0] shl 1) or 0b1
+                        masks[0] = (masks[0] shl 1) or 0b1L
                         masks[1] = masks[1] shl 1
                     }
                     '0' -> {
@@ -32,15 +32,15 @@ class DockingProgram(input: String): Program(input) {
                         masks[1] = masks[1] shl 1
                     }
                     '1' -> {
-                        masks[0] = (masks[0] shl 1) or 0b1
-                        masks[1] = (masks[1] shl 1) or 0b1
+                        masks[0] = (masks[0] shl 1) or 0b1L
+                        masks[1] = (masks[1] shl 1) or 0b1L
                     }
                 }
                 masks
             }
         }
-        it.toMemAccess()?.let { (idx, value) ->
-            memory[idx] = (value and masks[0]) or masks[1]
+        it.toMemAccess()?.let { (address, value) ->
+            memory[address] = (value and masks[0]) or masks[1]
         }
     }
 }
@@ -51,12 +51,11 @@ class DockingAddressProgram(input: String): Program(input) {
     fun execute() = program.forEach {
         it.toMask()?.let { value -> mask = value }
         it.toMemAccess()?.let { (address, value) ->
-            val start = address.countLeadingZeroBits()
-            storeValueUsingMask(start, address, value)
+            storeValueUsingMask(0, address, value)
         }
     }
 
-    private fun storeValueUsingMask(mostSignificantBit: Int, address: Int, value: Long) {
+    private fun storeValueUsingMask(mostSignificantBit: Int, address: Long, value: Long) {
         if (mostSignificantBit > mask.lastIndex) {
             memory[address] = value
             return
@@ -65,12 +64,12 @@ class DockingAddressProgram(input: String): Program(input) {
         val shift = mask.lastIndex - mostSignificantBit
         val newAddress = when (mask[mostSignificantBit]) {
             'X' -> {
-                val forcedZeroBit = address and (0b1 shl shift).inv()
+                val forcedZeroBit = address and (0b1L shl shift).inv()
                 storeValueUsingMask(nextSignificantBit, forcedZeroBit, value)
-                address or (0b1 shl shift)
+                address or (0b1L shl shift)
             }
             '0' -> address
-            '1' -> address or (0b1 shl shift)
+            '1' -> address or (0b1L shl shift)
             else -> throw IllegalStateException("Expected valid mask character")
         }
         storeValueUsingMask(nextSignificantBit, newAddress, value)
