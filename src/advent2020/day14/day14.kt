@@ -1,18 +1,26 @@
 package advent2020.day14
 
-import advent2020.day6.sample
+import java.lang.IllegalStateException
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 
-// this isn't valid for the problem set in a variety of ways
-fun String.toMask() = map { it.toInt() }.fold(0) { total, value -> (total shl 1) or (value and 0b1) }
+sealed class Program(input: String) {
+    protected val program: Sequence<String> = input.lineSequence()
+    protected var memory = mutableMapOf<Int, Long>().withDefault { 0 }
 
-class DockingProgram(input: String) {
-    private val program: Sequence<String> = input.lineSequence()
-    var masks = LongArray(2)
-    var memory = mutableMapOf<Int, Long>().withDefault { 0 }
+    fun String.toMask(): String? = "^mask = ([01X]+)$".toRegex().find(this)?.destructured?.let { (value) -> value }
+
+    fun String.toMemAccess(): Pair<Int, Long>? = "^mem\\[([0-9]+)] = ([0-9]+)$".toRegex().find(this)?.destructured
+        ?.let { (idx, value) -> idx.toInt() to value.toLong() }
+
+    fun sumOfValuesInMemory() = memory.asSequence().sumOf { (_, value) -> value }
+}
+
+class DockingProgram(input: String): Program(input) {
+    private var masks = LongArray(2)
 
     fun execute() = program.forEach {
-        "^mask = ([01X]+)$".toRegex().find(it)?.destructured?.let { (value) ->
+        it.toMask()?.let { value ->
             masks = value.asSequence().fold(LongArray(2)) { masks, bit ->
                 when (bit) {
                     'X' -> {
@@ -31,12 +39,42 @@ class DockingProgram(input: String) {
                 masks
             }
         }
-        "^mem\\[([0-9]+)] = ([0-9]+)$".toRegex().find(it)?.destructured?.let { (idx, value) ->
-            memory[idx.toInt()] = (value.toLong() and masks[0]) or masks[1]
+        it.toMemAccess()?.let { (idx, value) ->
+            memory[idx] = (value and masks[0]) or masks[1]
+        }
+    }
+}
+
+class DockingAddressProgram(input: String): Program(input) {
+    private lateinit var mask: String
+
+    fun execute() = program.forEach {
+        it.toMask()?.let { value -> mask = value }
+        it.toMemAccess()?.let { (address, value) ->
+            val start = address.countLeadingZeroBits()
+            storeValueUsingMask(start, address, value)
         }
     }
 
-    fun sumOfValuesInMemory() = memory.asSequence().sumOf { (_, value) -> value }
+    private fun storeValueUsingMask(mostSignificantBit: Int, address: Int, value: Long) {
+        if (mostSignificantBit > mask.lastIndex) {
+            memory[address] = value
+            return
+        }
+        val nextSignificantBit = mostSignificantBit + 1
+        val shift = mask.lastIndex - mostSignificantBit
+        val newAddress = when (mask[mostSignificantBit]) {
+            'X' -> {
+                val forcedZeroBit = address and (0b1 shl shift).inv()
+                storeValueUsingMask(nextSignificantBit, forcedZeroBit, value)
+                address or (0b1 shl shift)
+            }
+            '0' -> address
+            '1' -> address or (0b1 shl shift)
+            else -> throw IllegalStateException("Expected valid mask character")
+        }
+        storeValueUsingMask(nextSignificantBit, newAddress, value)
+    }
 }
 
 fun main() {
@@ -46,5 +84,14 @@ fun main() {
 
     val pt1Program = DockingProgram(input)
     pt1Program.execute()
-    println(pt1Program.sumOfValuesInMemory())
+    assertEquals(7477696999511, pt1Program.sumOfValuesInMemory())
+
+    val samplePt2 = DockingAddressProgram(sample2)
+    samplePt2.execute()
+    assertEquals(208, samplePt2.sumOfValuesInMemory())
+
+    val pt2Program = DockingAddressProgram(input)
+    pt2Program.execute()
+    assertNotEquals(343251513917, pt2Program.sumOfValuesInMemory())
+    println(pt2Program.sumOfValuesInMemory())
 }
