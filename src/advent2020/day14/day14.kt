@@ -1,8 +1,6 @@
 package advent2020.day14
 
-import java.lang.IllegalStateException
 import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 
 sealed class Program(input: String) {
     protected val program: Sequence<String> = input.lineSequence()
@@ -91,6 +89,5 @@ fun main() {
 
     val pt2Program = DockingAddressProgram(input)
     pt2Program.execute()
-    assertNotEquals(343251513917, pt2Program.sumOfValuesInMemory())
-    println(pt2Program.sumOfValuesInMemory())
+    assertEquals(3687727854171, pt2Program.sumOfValuesInMemory())
 }
