@@ -33,10 +33,12 @@ class StaggeredSchedule(input: String) {
     }
 
     fun nextStaggeredArrivalStartTime(): Long {
-        val firstId: Long = ids.first().first.toLong()
+        val firstId = ids.first().first.toLong()
+        val maxId = ids.maxOf { it.second }.toLong()
+        val increment = (maxId / firstId + 1) * firstId
         var checkFirst = firstId
         do {
-            checkFirst += firstId
+            checkFirst += increment
         } while (!checkNextValue(checkFirst, 1))
         return checkFirst
     }
