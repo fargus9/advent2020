@@ -76,12 +76,15 @@ class WaypointProgram(input: String): Program(input) {
     }
 
     override fun north(arg: Int) { wayPoint[Y_AXIS] -= arg }
-
     override fun south(arg: Int) { wayPoint[Y_AXIS] += arg }
-
     override fun west(arg: Int) { wayPoint[X_AXIS] -= arg }
-
     override fun east(arg: Int) { wayPoint[X_AXIS] += arg }
+    override fun left(arg: Int) = repeat(arg / 90) { wayPoint.turnLeft() }
+    override fun right(arg: Int) = repeat(arg / 90) { wayPoint.turnRight() }
+    override fun forward(arg: Int) {
+        position[X_AXIS] += arg * wayPoint[X_AXIS]
+        position[Y_AXIS] += arg * wayPoint[Y_AXIS]
+    }
 
     private fun WayPoint.turnLeft() {
         val tmp = this[X_AXIS]
@@ -93,15 +96,6 @@ class WaypointProgram(input: String): Program(input) {
         val tmp = this[X_AXIS]
         this[X_AXIS] = this[Y_AXIS] * -1
         this[Y_AXIS] = tmp
-    }
-
-    override fun left(arg: Int) = repeat(arg / 90) { wayPoint.turnLeft() }
-
-    override fun right(arg: Int) = repeat(arg / 90) { wayPoint.turnRight() }
-
-    override fun forward(arg: Int) {
-        position[X_AXIS] += arg * wayPoint[X_AXIS]
-        position[Y_AXIS] += arg * wayPoint[Y_AXIS]
     }
 }
 
