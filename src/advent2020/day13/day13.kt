@@ -23,13 +23,11 @@ val DepartingBus.departingId: Int
     get() = first * second
 
 class StaggeredSchedule(input: String) {
-    private val ids: List<DepartingBus>
-    init {
-        ids = input.splitToSequence(",").foldIndexed(mutableListOf()) { index, combined, value ->
+    private val ids: Array<DepartingBus> =
+        input.splitToSequence(",").foldIndexed(mutableListOf<DepartingBus>()) { index, combined, value ->
             if (value != "x") { combined.add(value.toInt() to index) }
             combined
-        }
-    }
+        }.toTypedArray()
 
     fun nextStaggeredArrivalStartTime(): Long {
         val firstId = ids.first().first.toLong()
@@ -51,8 +49,7 @@ class StaggeredSchedule(input: String) {
     private tailrec fun checkNextValue(check: Long, index: Int): Int {
         if (index > ids.lastIndex) { return index }
         val (id, offset) = ids[index]
-        val nextStep = (check / id + 1) * id
-        return if (check + offset == nextStep) { checkNextValue(check, index + 1) } else { index - 1 }
+        return if ((check + offset) % id == 0L) { checkNextValue(check, index + 1) } else { index - 1 }
     }
 }
 
@@ -74,5 +71,5 @@ fun main() {
     assertEquals(1068781, pt2SampleTest)
 
     val pt2Output = StaggeredSchedule(input.lineSequence().last()).nextStaggeredArrivalStartTime()
-    println(pt2Output)
+    assertEquals(645338524823718, pt2Output)
 }
