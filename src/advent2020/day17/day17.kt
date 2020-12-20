@@ -64,13 +64,6 @@ class Pocket(input: String) {
 
     val activeCubes: Int
         get() = state.asSequence().sumOf { (_, state) -> state.sumOf { row -> row.count { it == '#' } } }
-
-    val comparisonState: Map<Int, String>
-        get() {
-            return state.asSequence().associate { (z, plane) ->
-                z to plane.asSequence().joinToString("\n") { it.joinToString("") }
-            }
-        }
 }
 
 class FourDPocket(input: String) {
@@ -145,16 +138,7 @@ class FourDPocket(input: String) {
 
 fun main() {
     val samplePocket = Pocket(sampleInitial)
-    sampleCycles.forEachIndexed { index, pocket ->
-        samplePocket.applyBootStep()
-        with (samplePocket.comparisonState) {
-            //assertEquals(pocket.keys, keys, "z mismatch for $index")
-            pocket.forEach { (z, plane) ->
-              //  assertEquals(plane, this[z], "pocket mismatch for z $z cycle $index")
-            }
-        }
-    }
-    repeat(3) {
+    repeat(6) {
         samplePocket.applyBootStep()
     }
     assertEquals(112, samplePocket.activeCubes)
